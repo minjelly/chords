@@ -1,0 +1,5 @@
+1) edited all mp3 files to get rid of virtually all latency
+
+2) created a delay timer that increments each update once a key is released, which has the effect of stopping notes once a key is released 15 frames afterwards so notes do not hold on
+
+3)

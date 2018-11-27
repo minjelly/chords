@@ -30,15 +30,28 @@ public class PlayAudio : MonoBehaviour {
     AudioSource[] audioArray;
     AudioClip[] clipArray;
 
+    int[] delayArray;
+    bool[] incrementDelay;
+
+    bool[] activeChannels;
+    bool[] inactiveChannels;
+    public bool[] currentlyPlaying;
+
     public void Awake()
     {
-      
+
+        activeChannels = new bool[18];
+        inactiveChannels = new bool[18];
+        currentlyPlaying = new bool[18];
 
         audioArray = new AudioSource[18]; 
 
         clipArray = new AudioClip[] { clipC, clipCsh, clipD, clipDsh,
         clipE, clipF, clipFsh, clipG, clipGsh, clipA, clipAsh, clipB,
         clipChi, clipCshhi, clipDhi, clipDshhi, clipEhi, clipFhi};
+
+        delayArray = new int[18];
+        incrementDelay = new bool[18];
 
         for (int i = 0; i < 18; i++)
         {
@@ -53,12 +66,9 @@ public class PlayAudio : MonoBehaviour {
         return newAudio;
     }
 
+
 public void Update()
     {
-        
-        //float halfstep = 12;
-
-        bool[] activeChannels = new bool[18];
 
         activeChannels[0] = Input.GetKeyDown("a"); //C
         activeChannels[1] = Input.GetKeyDown("w"); //C#
@@ -67,7 +77,7 @@ public void Update()
         activeChannels[4] = Input.GetKeyDown("d"); //C
         activeChannels[5] = Input.GetKeyDown("f"); //C
         activeChannels[6] = Input.GetKeyDown("t"); //C
-        activeChannels[7] = Input.GetKeyDown("g"); //C
+        activeChannels[7] = Input.GetKeyDown("g"); //C test
         activeChannels[8] = Input.GetKeyDown("y"); //C
         activeChannels[9] = Input.GetKeyDown("h"); //C
         activeChannels[10] = Input.GetKeyDown("u"); //C
@@ -79,24 +89,65 @@ public void Update()
         activeChannels[16] = Input.GetKeyDown(";"); //C
         activeChannels[17] = Input.GetKeyDown("'"); //C
 
+        inactiveChannels[0] = Input.GetKeyUp("a"); //C
+        inactiveChannels[1] = Input.GetKeyUp("w"); //C#
+        inactiveChannels[2] = Input.GetKeyUp("s"); //D
+        inactiveChannels[3] = Input.GetKeyUp("e"); //
+        inactiveChannels[4] = Input.GetKeyUp("d"); //C
+        inactiveChannels[5] = Input.GetKeyUp("f"); //C
+        inactiveChannels[6] = Input.GetKeyUp("t"); //C
+        inactiveChannels[7] = Input.GetKeyUp("g"); //C
+        inactiveChannels[8] = Input.GetKeyUp("y"); //C
+        inactiveChannels[9] = Input.GetKeyUp("h"); //C
+        inactiveChannels[10] = Input.GetKeyUp("u"); //C
+        inactiveChannels[11] = Input.GetKeyUp("j"); //C
+        inactiveChannels[12] = Input.GetKeyUp("k"); //C
+        inactiveChannels[13] = Input.GetKeyUp("o"); //C
+        inactiveChannels[14] = Input.GetKeyUp("l"); //C
+        inactiveChannels[15] = Input.GetKeyUp("p"); //C
+        inactiveChannels[16] = Input.GetKeyUp(";"); //C
+        inactiveChannels[17] = Input.GetKeyUp("'"); //C
+
         ArrayList toPlay = new ArrayList();
+        ArrayList toStop = new ArrayList();
 
         for (int i = 0; i < 18; i++)
         {
 
             if (activeChannels[i]) {
-                //AudioClip hitClip = clipArray[i];
                 toPlay.Add(i);
-            } else
+            } 
+
+            if (inactiveChannels[i])
             {
-                //audioArray[i].Stop();
+                toStop.Add(i);
             }
-
-
         }
 
         foreach (int i in toPlay) {
+            delayArray[i] = 0;
+            incrementDelay[i] = false;
             audioArray[i].Play();
+            currentlyPlaying[i] = true;
+        }
+
+        foreach (int i in toStop)
+        {
+            incrementDelay[i] = true;
+        }
+
+        for (int i = 0; i < 18; i++)
+        {
+            if (incrementDelay[i])
+            {
+                delayArray[i]++;
+            }
+
+            if (delayArray[i] == 15)
+            {
+                audioArray[i].Stop();
+                currentlyPlaying[i] = false;
+            }
         }
 
     }
